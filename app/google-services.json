@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1083132537247",
+    "project_id": "sample-chrono",
+    "storage_bucket": "sample-chrono.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083132537247:android:5b95c7705a5f62bd64b5aa",
+        "android_client_info": {
+          "package_name": "com.mking1102.sample"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0Ijg4qbdFrwTgHK8ipn7G3Axeu6K1jhY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
