@@ -27,4 +27,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        viewModel.setLocalPrefs();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.getPrefs();
+    }
 }

@@ -35,6 +35,7 @@ public class MainActivityViewModel extends ViewModel {
     private long elapsedTime = 0L;
     private long lapTime = 0L;
     private boolean running = false;
+
     private final Handler handler = new Handler();
 
     private final ChronosRepository chronosRepository;
@@ -82,14 +83,22 @@ public class MainActivityViewModel extends ViewModel {
     private void startChronometer() {
         if (!running) {
             startTime = System.currentTimeMillis() - elapsedTime;
-            lapTime = startTime;
+
+            // If lapTime is 0 (first run), set it to startTime
+            if (lapTime == 0) {
+                lapTime = startTime;
+            } else {
+                lapTime = System.currentTimeMillis() - lapTime;
+            }
+
+
             running = true;
             handler.post(updateTimer);
             updateChronosUiState(elapsedTime);
 
-            if (chronosStates.getValue() == ChronosStates.Paused){
+            if (chronosStates.getValue() == ChronosStates.Paused) {
                 handleTapWithLabel("Resume");
-            }else{
+            } else {
                 handleTapWithLabel("Start");
             }
             chronosStates.postValue(ChronosStates.Running);
@@ -107,7 +116,9 @@ public class MainActivityViewModel extends ViewModel {
         if (running) {
             running = false;
             elapsedTime = System.currentTimeMillis() - startTime;
+            lapTime = System.currentTimeMillis() - lapTime;
             handler.removeCallbacks(updateTimer);
+
             updateChronosUiState(elapsedTime);
             chronosStates.postValue(ChronosStates.Paused);
             hasReset = true;
@@ -119,6 +130,7 @@ public class MainActivityViewModel extends ViewModel {
         running = false;
         elapsedTime = 0L;
         startTime = 0L;
+        lapTime = 0L;
         currentLap = 0;
         handler.removeCallbacks(updateTimer);
         chronosRepository.deleteAll();
@@ -137,36 +149,44 @@ public class MainActivityViewModel extends ViewModel {
 
 
     public void addLap() {
-        ChronosUiState currentState = chronosUiState.getValue();
         elapsedTime = System.currentTimeMillis() - startTime;
         long currentLapTime = System.currentTimeMillis() - lapTime;
         lapTime = System.currentTimeMillis();
-        if (currentState != null) {
 
-            String totalTime = formatTime(elapsedTime);
-            currentLap = currentLap + 1;
-            chronosRepository.insertTimeStates(new TimeStates("Lap " + (currentLap), formatTime(currentLapTime), totalTime, currentLap));
-        }
+
+        String totalTime = formatSavable(elapsedTime);
+        currentLap = currentLap + 1;
+        chronosRepository.insertTimeStates(new TimeStates("Lap " + (currentLap), formatSavable(currentLapTime), totalTime, currentLap));
         handleTapWithLabel("Lap");
     }
 
     public void setLocalPrefs() {
-        ChronosPref pref = new ChronosPref(startTime, lapTime, elapsedTime, currentLap);
+
+        long currentLapTime = 0;
+        long currentElapsedTime = 0;
+
+        if (!running) {
+            currentLapTime = lapTime;
+            currentElapsedTime = elapsedTime;
+        } else {
+            currentLapTime = System.currentTimeMillis() - lapTime;
+            currentElapsedTime = System.currentTimeMillis() - startTime;
+        }
+        ChronosPref pref = new ChronosPref(0L, currentLapTime, currentElapsedTime, currentLap);
 
         chronosRepository.setPrefs(pref);
     }
 
 
     public void getPrefs() {
-        ChronosPref pref = chronosRepository.getCurrentPrefs();
-
-        lapTime = pref.lapTime();
-        startTime = pref.startTime();
-        elapsedTime = pref.elapsedTime();
-        currentLap = pref.currentLap();
-
-
-        updateChronosUiState(elapsedTime);
+        if (!running) {
+            ChronosPref pref = chronosRepository.getCurrentPrefs();
+            lapTime = (pref.lapTime() > 0) ? pref.lapTime() : startTime;
+            startTime = pref.startTime();
+            elapsedTime = pref.elapsedTime();
+            currentLap = pref.currentLap();
+            updateChronosUiState(elapsedTime);
+        }
     }
 
 
@@ -186,6 +206,15 @@ public class MainActivityViewModel extends ViewModel {
 
         chronosUiState.postValue(newState);
     }
+
+    private String formatSavable(long millis) {
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60;
+        long milliseconds = (millis % 1000) / 10;
+        return String.format(Locale.getDefault(), "%01d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds);
+    }
+
 
     private String formatTime(long millis) {
         long hours = TimeUnit.MILLISECONDS.toHours(millis);

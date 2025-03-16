@@ -50,7 +50,7 @@ public class PreferenceManager {
     }
 
     private long getStartTime() {
-        return sharedPreferences.getLong(KEY_START_TIME, 0);
+        return sharedPreferences.getLong(KEY_START_TIME, 0L);
     }
 
     private void setLapTime(long lapTime) {
@@ -58,7 +58,7 @@ public class PreferenceManager {
     }
 
     private long getLapTime() {
-        return sharedPreferences.getLong(KEY_LAP_TIME, 0);
+        return sharedPreferences.getLong(KEY_LAP_TIME, 0L);
     }
 
     private void setLap(int lap) {

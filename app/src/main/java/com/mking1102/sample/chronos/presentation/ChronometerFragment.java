@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -14,12 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mking1102.sample.MainActivityViewModel;
-import com.mking1102.sample.chronos.domain.models.TimeStates;
-import com.mking1102.sample.databinding.FragmentMyBinding;
 import com.mking1102.sample.chronos.domain.utils.ChronosStates;
+import com.mking1102.sample.databinding.FragmentMyBinding;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -65,7 +61,7 @@ public class ChronometerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.getPrefs();
+
         toggleButton.setOnClickListener(c -> viewModel.toggleChronometer());
         viewModel.getChronosUiState().observe(getViewLifecycleOwner(), state -> {
 
@@ -116,7 +112,7 @@ public class ChronometerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        viewModel.setLocalPrefs();
+
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.mking1102.sample.chronos.data.data_source;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Ignore;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -21,7 +20,7 @@ public interface TimeStatesDao {
     void deleteAll();
 
     @Query("Select * From time_states order by lapIndex Desc")
-    public LiveData<List<TimeStates>> getAllTimeStates();
+    LiveData<List<TimeStates>> getAllTimeStates();
 
 
 }
